@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 
 import rclpy
-from rclpy.action import ActionClient
 from rclpy.node import Node
 from nav_msgs.msg import OccupancyGrid, Path
 from geometry_msgs.msg import PoseStamped, Pose
 from rclpy.qos import QoSProfile, DurabilityPolicy
 from tf2_ros import Buffer, TransformListener, LookupException
 from queue import PriorityQueue
-from nav2_msgs.action import SmoothPath
 
 class GraphNode:
     def __init__(self, x, y, cost=0, heuristic=0, prev=None):
@@ -47,8 +45,6 @@ class AStarPlanner(Node):
         )
         self.path_pub = self.create_publisher(Path, "/a_star/path", 10)
         self.map_pub = self.create_publisher(OccupancyGrid, "/a_star/visited_map", 10)
-
-        self._action_client = ActionClient(self, SmoothPath, "smooth_path")
 
         self.map_ = None
         self.visited_map_ = OccupancyGrid()
@@ -134,29 +130,7 @@ class AStarPlanner(Node):
             active_node = active_node.prev
 
         path.poses.reverse()
-        self.smoothPath(path)
         return path
-    
-    def smoothPath(self, path: Path):
-        path_smooth = SmoothPath.Goal()
-        path_smooth.path = path
-        path_smooth.check_for_collisions = False
-        path_smooth.smoother_id = "simple_smoother"
-        path_smooth.max_smoothing_duration.sec = 10
-
-        future = self.smooth_client_.send_goal_async(path_smooth)
-        rclpy.spin_until_future_complete(self.node, future)
-
-        if future.done():
-            goal_handle = future.result()
-            if goal_handle.accepted:
-                result_future = goal_handle.get_result_async()
-                rclpy.spin_until_future_complete(self.node, result_future)
-
-                if result_future.done():
-                    result = result_future.result()
-                    if result.status == SmoothPath.Result.SUCCEEDED:
-                        path = result.result.path
 
     def manhattan_distance(self, node: GraphNode, goal_node: GraphNode):
         return abs(node.x - goal_node.x) + abs(node.y - goal_node.y)

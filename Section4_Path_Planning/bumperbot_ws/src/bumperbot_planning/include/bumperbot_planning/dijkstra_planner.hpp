@@ -4,14 +4,12 @@
 #include <memory>
 
 #include "rclcpp/rclcpp.hpp"
-#include "rclcpp_action/rclcpp_action.hpp"
 #include "nav_msgs/msg/path.hpp"
 #include "nav_msgs/msg/occupancy_grid.hpp"
 #include "geometry_msgs/msg/pose.hpp"
 #include "geometry_msgs/msg/pose_stamped.hpp"
 #include "tf2_ros/buffer.h"
 #include "tf2_ros/transform_listener.h"
-#include "nav2_msgs/action/smooth_path.hpp"
 
 
 namespace bumperbot_planning
@@ -58,8 +56,6 @@ private:
     std::shared_ptr<tf2_ros::TransformListener> tf_listener_;
     std::unique_ptr<tf2_ros::Buffer> tf_buffer_;
 
-    rclcpp_action::Client<nav2_msgs::action::SmoothPath>::SharedPtr smooth_client_;
-
     void mapCallback(const nav_msgs::msg::OccupancyGrid::SharedPtr map);
 
     void goalCallback(const geometry_msgs::msg::PoseStamped::SharedPtr pose);
@@ -67,8 +63,6 @@ private:
     nav_msgs::msg::Path plan(const geometry_msgs::msg::Pose & start, const geometry_msgs::msg::Pose & goal);
 
     bool poseOnMap(const GraphNode & node);
-
-    void smoothPath(nav_msgs::msg::Path & path);
 
     GraphNode worldToGrid(const geometry_msgs::msg::Pose & pose);
 

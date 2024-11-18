@@ -27,9 +27,6 @@ DijkstraPlanner::DijkstraPlanner() : Node("dijkstra_node")
     map_pub_ = create_publisher<nav_msgs::msg::OccupancyGrid>(
         "/dijkstra/visited_map", 10
     );
-
-    smooth_client_ = rclcpp_action::create_client<nav2_msgs::action::SmoothPath>(
-        this, "smooth_path");
 }
 
 void DijkstraPlanner::mapCallback(const nav_msgs::msg::OccupancyGrid::SharedPtr map)
@@ -122,31 +119,7 @@ nav_msgs::msg::Path DijkstraPlanner::plan(const geometry_msgs::msg::Pose & start
         active_node = *active_node.prev;
     }
     std::reverse(path.poses.begin(), path.poses.end());
-    smoothPath(path);
     return path;
-}
-
-void DijkstraPlanner::smoothPath(nav_msgs::msg::Path & path)
-{
-    nav2_msgs::action::SmoothPath::Goal path_smooth;
-    path_smooth.path = path;
-    path_smooth.check_for_collisions = false;
-    path_smooth.smoother_id = "simple_smoother";
-    path_smooth.max_smoothing_duration.sec = 10;
-    auto future = smooth_client_->async_send_goal(path_smooth);
-
-    if(future.wait_for(std::chrono::seconds(3)) == std::future_status::ready){
-      auto goal_handle = future.get();
-      if(goal_handle){
-        auto result_future = smooth_client_->async_get_result(goal_handle);
-        if(result_future.wait_for(std::chrono::seconds(3)) == std::future_status::ready){
-          auto result_path = result_future.get();
-          if(result_path.code == rclcpp_action::ResultCode::SUCCEEDED){
-            path = result_path.result->path;
-          }
-        }
-      }
-    }
 }
 
 bool DijkstraPlanner::poseOnMap(const GraphNode & node)
