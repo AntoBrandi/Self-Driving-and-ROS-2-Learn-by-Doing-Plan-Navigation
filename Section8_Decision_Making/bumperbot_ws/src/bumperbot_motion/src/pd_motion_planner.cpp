@@ -27,7 +27,7 @@ void PDMotionPlanner::configure(
     rclcpp::ParameterValue(2.0));
   nav2_util::declare_parameter_if_not_declared(
     node, plugin_name_ + ".kd",
-    rclcpp::ParameterValue(2.0));
+    rclcpp::ParameterValue(0.1));
   nav2_util::declare_parameter_if_not_declared(
     node, plugin_name_ + ".max_linear_velocity",
     rclcpp::ParameterValue(0.3));
