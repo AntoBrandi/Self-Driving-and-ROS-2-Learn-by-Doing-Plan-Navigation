@@ -1,0 +1,14 @@
+bt_navigator:
+  ros__parameters:
+    use_sim_time: true
+    global_frame: map
+    robot_base_frame: base_link
+    odom_topic: /bumperbot_controller/odom
+    enable_groot_monitoring: True
+    groot_zmq_publisher_port: 1666
+    groot_zmq_server_port: 1667
+    default_nav_to_pose_bt_xml: "/home/alien/bumperbot_ws/install/bumperbot_navigation/share/bumperbot_navigation/behavior_tree/simple_navigation.xml"
+    default_nav_through_poses_bt_xml: "/home/alien/bumperbot_ws/install/bumperbot_navigation/share/bumperbot_navigation/behavior_tree/simple_navigation.xml"
+    plugin_lib_names:
+    - nav2_compute_path_to_pose_action_bt_node
+    - nav2_follow_path_action_bt_node
