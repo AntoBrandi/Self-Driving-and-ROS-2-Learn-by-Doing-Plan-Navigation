@@ -6,7 +6,7 @@ from geometry_msgs.msg import Twist, PoseStamped
 from nav_msgs.msg import Path
 from tf2_ros import Buffer, TransformListener
 import math
-from tf_transformations import quaternion_matrix, inverse_matrix, concatenate_matrices
+from tf_transformations import quaternion_matrix, quaternion_from_matrix, translation_from_matrix, inverse_matrix, concatenate_matrices
 
 
 class PDMotionPlanner(Node):
@@ -151,11 +151,29 @@ class PDMotionPlanner(Node):
             self.get_logger().error(
                 f"Couldn't transform plan from frame {self.global_plan.header.frame_id} to {frame}: {ex}")
             return False
+        
+        transform_matrix = quaternion_matrix([
+                transform.transform.rotation.x,
+                transform.transform.rotation.y,
+                transform.transform.rotation.z,
+                transform.transform.rotation.w,
+            ])
+        transform_matrix[0][3] = transform.transform.translation.x
+        transform_matrix[1][3] = transform.transform.translation.y
 
         for pose in self.global_plan.poses:
-            pose.pose.position.x += transform.transform.translation.x
-            pose.pose.position.y += transform.transform.translation.y
-            # Optionally, handle rotation if needed here
+            pose_matrix = quaternion_matrix([
+                pose.pose.orientation.x,
+                pose.pose.orientation.y,
+                pose.pose.orientation.z,
+                pose.pose.orientation.w,
+            ])
+            pose_matrix[0][3] = pose.pose.position.x
+            pose_matrix[1][3] = pose.pose.position.y
+
+            transformed_pose = concatenate_matrices(pose_matrix, transform_matrix)
+            [pose.pose.orientation.x,pose.pose.orientation.y, pose.pose.orientation.z, pose.pose.orientation.w] = quaternion_from_matrix(transformed_pose)
+            [pose.pose.position.x, pose.pose.position.y, pose.pose.position.z] = translation_from_matrix(transformed_pose)
 
         self.global_plan.header.frame_id = frame
         return True
