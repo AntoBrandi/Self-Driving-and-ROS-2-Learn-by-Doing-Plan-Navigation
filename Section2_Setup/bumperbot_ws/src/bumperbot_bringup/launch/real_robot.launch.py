@@ -63,12 +63,6 @@ def generate_launch_description():
         executable="mpu6050_driver.py"
     )
 
-    safety_stop = Node(
-        package="bumperbot_utils",
-        executable="safety_stop",
-        output="screen",
-    )
-
     localization = IncludeLaunchDescription(
         os.path.join(
             get_package_share_directory("bumperbot_localization"),
@@ -94,7 +88,6 @@ def generate_launch_description():
         controller,
         joystick,
         imu_driver_node,
-        safety_stop,
         localization,
         slam
     ])
