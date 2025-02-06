@@ -41,7 +41,8 @@ void AStarPlanner::deactivate()
 
 nav_msgs::msg::Path AStarPlanner::createPlan(
   const geometry_msgs::msg::PoseStamped & start,
-  const geometry_msgs::msg::PoseStamped & goal)
+  const geometry_msgs::msg::PoseStamped & goal,
+  std::function<bool()>)
 {
   std::vector<std::pair<int, int>> explore_directions = {
     {-1, 0}, {1, 0}, {0, -1}, {0, 1}
