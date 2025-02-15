@@ -37,7 +37,7 @@ class DijkstraPlanner(Node):
         map_qos.durability = DurabilityPolicy.TRANSIENT_LOCAL
 
         self.map_sub = self.create_subscription(
-            OccupancyGrid, "/costmap/costmap", self.map_callback, map_qos
+            OccupancyGrid, "/costmap", self.map_callback, map_qos
         )
         self.pose_sub = self.create_subscription(
             PoseStamped, "/goal_pose", self.goal_callback, 10

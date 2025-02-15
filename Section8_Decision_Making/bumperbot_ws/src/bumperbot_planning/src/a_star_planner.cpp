@@ -30,6 +30,9 @@ void AStarPlanner::activate()
   RCLCPP_INFO(
     node_->get_logger(), "Activating plugin %s of type AStarPlanner",
     name_.c_str());
+  if (!smooth_client_->wait_for_action_server(std::chrono::seconds(3))) {
+    RCLCPP_ERROR(node_->get_logger(), "Action server not available after waiting");
+  }
 }
 
 void AStarPlanner::deactivate()
@@ -94,21 +97,23 @@ nav_msgs::msg::Path AStarPlanner::createPlan(
   }
   std::reverse(path.poses.begin(), path.poses.end());
 
-  nav2_msgs::action::SmoothPath::Goal path_smooth;
-  path_smooth.path = path;
-  path_smooth.check_for_collisions = false;
-  path_smooth.smoother_id = "simple_smoother";
-  path_smooth.max_smoothing_duration.sec = 10;
-  auto future = smooth_client_->async_send_goal(path_smooth);
+  if(smooth_client_->action_server_is_ready()){
+    nav2_msgs::action::SmoothPath::Goal path_smooth;
+    path_smooth.path = path;
+    path_smooth.check_for_collisions = false;
+    path_smooth.smoother_id = "simple_smoother";
+    path_smooth.max_smoothing_duration.sec = 10;
+    auto future = smooth_client_->async_send_goal(path_smooth);
 
-  if(future.wait_for(std::chrono::seconds(3)) == std::future_status::ready){
-    auto goal_handle = future.get();
-    if(goal_handle){
-      auto result_future = smooth_client_->async_get_result(goal_handle);
-      if(result_future.wait_for(std::chrono::seconds(3)) == std::future_status::ready){
-        auto result_path = result_future.get();
-        if(result_path.code == rclcpp_action::ResultCode::SUCCEEDED){
-          path = result_path.result->path;
+    if(future.wait_for(std::chrono::seconds(3)) == std::future_status::ready){
+      auto goal_handle = future.get();
+      if(goal_handle){
+        auto result_future = smooth_client_->async_get_result(goal_handle);
+        if(result_future.wait_for(std::chrono::seconds(3)) == std::future_status::ready){
+          auto result_path = result_future.get();
+          if(result_path.code == rclcpp_action::ResultCode::SUCCEEDED){
+            path = result_path.result->path;
+          }
         }
       }
     }
