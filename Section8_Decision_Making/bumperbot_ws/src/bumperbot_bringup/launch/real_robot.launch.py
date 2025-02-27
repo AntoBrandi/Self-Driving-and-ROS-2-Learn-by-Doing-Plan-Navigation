@@ -80,6 +80,14 @@ def generate_launch_description():
         ),
         condition=IfCondition(use_slam)
     )
+
+    navigation = IncludeLaunchDescription(
+        os.path.join(
+            get_package_share_directory("bumperbot_navigation"),
+            "launch",
+            "navigation.launch.py"
+        ),
+    )
     
     return LaunchDescription([
         use_slam_arg,
@@ -89,5 +97,6 @@ def generate_launch_description():
         joystick,
         imu_driver_node,
         localization,
-        slam
+        slam,
+        navigation,
     ])
