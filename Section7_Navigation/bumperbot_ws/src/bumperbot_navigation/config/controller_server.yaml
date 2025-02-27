@@ -8,7 +8,7 @@ controller_server:
     failure_tolerance: 0.3
     progress_checker_plugin: "progress_checker"
     goal_checker_plugins: ["general_goal_checker"]
-    controller_plugins: ["FollowPath"]
+    controller_plugins: ["FollowPath", "PurePursuit"]
     odom_topic: /bumperbot_controller/odom
 
     # Progress checker parameters
@@ -33,11 +33,11 @@ controller_server:
       step_size: 0.1
 
     # Pure Pursuit parameters
-    # FollowPath:
-    #   plugin: "bumperbot_motion::PurePursuit"
-    #   look_ahead_distance: 0.5
-    #   max_linear_velocity: 0.3
-    #   max_angular_velocity: 1.0
+    PurePursuit:
+      plugin: "bumperbot_motion::PurePursuit"
+      look_ahead_distance: 0.5
+      max_linear_velocity: 0.3
+      max_angular_velocity: 1.0
 
 local_costmap:
   local_costmap:
