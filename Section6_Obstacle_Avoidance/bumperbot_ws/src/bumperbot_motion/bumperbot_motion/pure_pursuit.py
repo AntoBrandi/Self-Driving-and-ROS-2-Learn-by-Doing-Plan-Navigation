@@ -108,7 +108,7 @@ class PurePursuit(Node):
         #  Create and publish the velocity command
         cmd_vel = Twist()
         cmd_vel.linear.x = self.max_linear_velocity
-        cmd_vel.angular.z = curvature * self.max_linear_velocity
+        cmd_vel.angular.z = curvature * self.max_angular_velocity
         self.cmd_pub.publish(cmd_vel)
 
     def get_carrot_pose(self, robot_pose: PoseStamped) -> PoseStamped:
