@@ -15,7 +15,7 @@ AStarPlanner::AStarPlanner() : Node("a_star_node")
     rclcpp::QoS map_qos(10);
     map_qos.durability(RMW_QOS_POLICY_DURABILITY_TRANSIENT_LOCAL);
     map_sub_ = create_subscription<nav_msgs::msg::OccupancyGrid>(
-        "/costmap/costmap", map_qos, std::bind(&AStarPlanner::mapCallback, this, std::placeholders::_1));
+        "/costmap", map_qos, std::bind(&AStarPlanner::mapCallback, this, std::placeholders::_1));
 
     pose_sub_ = create_subscription<geometry_msgs::msg::PoseStamped>(
         "/goal_pose", 10, std::bind(&AStarPlanner::goalCallback, this, std::placeholders::_1));
