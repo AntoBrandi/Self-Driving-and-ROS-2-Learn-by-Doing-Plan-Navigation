@@ -78,13 +78,13 @@ class SimpleController(Node):
         # Given the position of the wheels, calculates their velocities
         # then calculates the velocity of the robot wrt the robot frame
         # and then converts it in the global frame and publishes the TF
-        dp_left = msg.position[1] - self.left_wheel_prev_pos_
-        dp_right = msg.position[0] - self.right_wheel_prev_pos_
+        dp_left = msg.position[0] - self.left_wheel_prev_pos_
+        dp_right = msg.position[1] - self.right_wheel_prev_pos_
         dt = Time.from_msg(msg.header.stamp) - self.prev_time_
 
         # Actualize the prev pose for the next itheration
-        self.left_wheel_prev_pos_ = msg.position[1]
-        self.right_wheel_prev_pos_ = msg.position[0]
+        self.left_wheel_prev_pos_ = msg.position[0]
+        self.right_wheel_prev_pos_ = msg.position[1]
         self.prev_time_ = Time.from_msg(msg.header.stamp)
 
         # Calculate the rotational speed of each wheel
